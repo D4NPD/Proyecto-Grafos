@@ -1,9 +1,3 @@
-<script type="text/javascript"> 
-      function adyacentes(nodo){
-
-      }
-
-</script>
 <?php
   include("grafo.php");
   session_start();
@@ -14,18 +8,18 @@
 $accion = (isset($_POST["accion"]))?$_POST["accion"]:"";
 
 switch ($accion) {
-  case 'Guardar Vertice':
-    if (empty($_POST["Vertice"])) {
-      $Message = 'El campo de texto no puede estar vacio';
-    }else {
-      if($_SESSION["grafo"]->agregarVertice(new vertice($_POST["Vertice"]))){
-        $Message = 'Guardado Correctamente';
-      }else{
-        $Message = 'El elemento ya existe';
+    case 'Guardar Vertice':
+      if (empty($_POST["Vertice"])) {
+        $Message = 'El campo de texto no puede estar vacio';
+      }else {
+        if($_SESSION["grafo"]->agregarVertice(new vertice($_POST["Vertice"]))){
+          $Message = 'Guardado Correctamente';
+        }else{
+          $Message = 'El nodo ya existe';
+        }
       }
-    }
-    echo "<script type='text/javascript'>alert('$Message');</script>";
-    break;
+      echo "<script type='text/javascript'>alert('$Message');</script>";
+      break;
 
     case 'Buscar Vertice':
       if (empty($_POST['Vertice'])) {
@@ -38,28 +32,12 @@ switch ($accion) {
         }else{
           $Message = "No existe el vertice ";
         }
-
       }
       echo "<script type='text/javascript'>alert('$Message');</script>";
       break;
 
-    case 'Buscar Adyacentes':
-      if (empty($_POST['Vertice'])) {
-        $Message = 'Ingrese el vertice que desea buscar';
-      }else{
-        $vector = $_SESSION['grafo']->getAdyacentes($_POST['Vertice']);
-        if($vector!=null){
-          $Message = "Encontrado";
-          print_r($vector);
-        }else{
-          $Message = "No existe el vertice";
-        }
-      }
-      echo "<script type='text/javascript'>alert('$Message');</script>";
-      break;
-
-  case 'Guardar Adyacencia':
-    if (empty($_POST["Origen"]) && empty($_POST["Destino"])) {
+    case 'Guardar Adyacencia':
+      if (empty($_POST["Origen"]) && empty($_POST["Destino"])) {
         $Message = 'El campo de texto no puede estar vacio';
       }else{
         if($_SESSION["grafo"]->agregarArista($_POST["Origen"],$_POST["Destino"],$_POST["Peso"])){
@@ -69,21 +47,21 @@ switch ($accion) {
         }
       }
       echo "<script type='text/javascript'>alert('$Message');</script>";
-    break;
+      break;
 
- case 'Eliminar Arista':
-    if(empty($_POST["Origen"]) && empty($_POST["Destino"])){
-      $Message = 'Los campos de texto no pueden estar vacios';
-    }else{
-      if($_SESSION["grafo"]->eliminarArista($_POST["Origen"], $_POST["Destino"])){
-        $Message = 'Vertices Deselanzados Correctamente';
+    case 'Eliminar Arista':
+      if(empty($_POST["Origen"]) && empty($_POST["Destino"])){
+        $Message = 'Los campos de texto no pueden estar vacios';
       }else{
-        $Message = 'Vertices no enlazados o inexistentes';
+        if($_SESSION["grafo"]->eliminarArista($_POST["Origen"], $_POST["Destino"])){
+          $Message = 'Vertices Deselanzados Correctamente';
+        }else{
+          $Message = 'Vertices no enlazados o inexistentes';
+        }
       }
-    }
-    echo "<script type='text/javascript'>alert('$Message');</script>";
-    break;
-    
+      echo "<script type='text/javascript'>alert('$Message');</script>";
+      break;
+
     case 'Eliminar Vertice':
       if(empty($_POST["Vertice"])){
         $Message = 'Ingrese el vertice que desea eliminar';
@@ -94,9 +72,9 @@ switch ($accion) {
           $Message = 'Verice inexistente';
         }
       }
-    echo "<script type='text/javascript'>alert('$Message');</script>";
-    break;
-    
+      echo "<script type='text/javascript'>alert('$Message');</script>";
+      break;
+
     case 'Mostrar Grado':
       if(empty($_POST["Vertice"])){
         $Message = 'Ingrese el vertice para ver su grado';
@@ -108,9 +86,8 @@ switch ($accion) {
           $Message = 'Grado: '.$grado;
         }
       }
-    echo "<script type='text/javascript'>alert('$Message');</script>";
-      
-       
+      echo "<script type='text/javascript'>alert('$Message');</script>";
+      break;
 
 }
 
@@ -121,44 +98,79 @@ switch ($accion) {
     <meta charset="utf-8">
     <script type="text/javascript" src="vis/dist/vis.js"></script>
     <link rel="stylesheet" href="vis/dist/vis.css" type="text/css">
-    <title>Mi grafo</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <title>Proyecto de Grafos</title>
   </head>
   <body>
-    <h1>Mi Grafo</h1>
-    <div>
-      <form action="index.php" method="post">
-        <h3>Agregar Vertices</h3>
-        <label> Incerte el vertice </label>
-        <input type="text" name="Vertice">
-        <input type="submit" name="accion" value="Guardar Vertice">
-        <input type="submit" name="accion" value="Buscar Vertice">
-        <input type="submit" name="accion" value="Buscar Adyacentes">
-        <input type="submit" name="accion" value="Eliminar Vertice">
-        <input type="submit" name="accion" value="Mostrar Grado">
+    <h1>Proyecto de Grafos</h1>
+    <div class="container" id="nodo">
+      <form action="index.php" method="post" id="vertice">
+        <h2> Vertices</h2>
+        <input type="text" name="Vertice" placeholder="ID del verice" required>
+        <input class="verde" type="submit" name="accion" value="Guardar Vertice">
+        <input class="azul" type="submit" name="accion" value="Buscar Vertice">
+        <input class="azul" type="submit" name="accion" value="Buscar Adyacentes">
+        <input class="rojo" type="submit" name="accion" value="Eliminar Vertice">
+        <input class="info" type="submit" name="accion" value="Mostrar Grado">
       </form>
     </div>
-    <div>
-      <form action="index.php" method="post">
-        <h3> Agregar Aristas </h3>
-        <label>Ingrese vertice de origen</label>
-        <input type="text" name="Origen">
-        <label>Ingrese vertice de destino</label>
-        <input type="text" name="Destino">
-        <label>Ingrese el peso (Opcional)</label>
-        <input type="text" name="Peso">
-        <input type="submit" name="accion" value="Guardar Adyacencia">
-        <input type="submit" name="accion" value="Eliminar Arista">
+    <div class="container" id="adya">
+      <form action="index.php" method="post" id="aristas">
+        <h2> Aristas </h2>
+        <input type="text" name="Origen" placeholder="Vertice de origen" required>
+        <input type="text" name="Destino" placeholder="Vertice de destino" required>
+        <input type="text" name="Peso" placeholder="Peso (Opcional)">
+        <input class="verde" type="submit" name="accion" value="Guardar Adyacencia">
+        <input class="rojo" type="submit" name="accion" value="Eliminar Arista">
       </form>
     </div>
-    <hr>
-    <div id="Grafo1" style=" float: left; width: 400px; height: 300px; border: 1px solid lightgray;" >
+
+    <div class="container" id="Grafo1">
 
     </div>
-    <div id="Adyacente" style=" float: left; width: 400px; height: 300px; border: 1px solid lightgray;">
+    <div class="container" id="Adyacente">
 
     </div>
-  </body>
-  <br>
+
+  <?php
+    if($accion == 'Buscar Adyacentes'){
+      if (empty($_POST['Vertice'])) {
+        $Message = 'Ingrese el vertice que desea buscar';
+      }else{
+        $nodo = $_POST['Vertice'];
+        $vector = $_SESSION['grafo']->getAdyacentes($nodo);
+        if($vector!=null){
+          $Message = null;
+          echo "<script type='text/javascript'> var adya = new vis.DataSet([";
+          foreach ($vector as $key => $value) {
+            echo "{id:'$key', label: '$key'},";
+          };
+          if(!isset($vector[$nodo])){
+            echo "{id:'$nodo', label:'$nodo'}";
+          };
+          echo "]);";
+          echo "var aris = new vis.DataSet([";
+          foreach ($vector as $key => $value) {
+            echo "{from: '$nodo', to: '$key', label: '$value' },";
+          };
+          echo "]);";
+          echo "var contenedor = document.getElementById('Adyacente');";
+          echo "var opc = { edges: { arrows:{ to:{ enabled: true }}}};";
+          echo "var dat = {nodes: adya, edges: aris}; var nuevo = new vis.Network(contenedor, dat, opc);";
+          echo "</script>";
+        }else{
+          if(!isset(($_SESSION['grafo']->getVertices())[$nodo])){
+            $Message="El vertice no existe";
+          }else{
+            $Message="El nodo ".$nodo." no tiene adyacentes";
+          }
+        }
+      }
+      if ($Message!=null) {
+        echo "<script type='text/javascript'>alert('$Message');</script>";
+      }
+    }
+?>
   <script type="text/javascript">
 
     var nodos = new vis.DataSet([
@@ -199,5 +211,5 @@ switch ($accion) {
     };
     var eldato = new vis.Network(contenedor, datos, opciones);
   </script>
-
+</body>
 </html>
