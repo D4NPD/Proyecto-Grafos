@@ -6,19 +6,21 @@
   }
 
 $accion = (isset($_POST["accion"]))?$_POST["accion"]:"";
-
+$respuesta = "";
 switch ($accion) {
     case 'Guardar Vertice':
       if (empty($_POST["Vertice"])) {
         $Message = 'El campo de texto no puede estar vacio';
       }else {
         if($_SESSION["grafo"]->agregarVertice(new vertice($_POST["Vertice"]))){
-          $Message = 'Guardado Correctamente';
+          $Message = null;
         }else{
           $Message = 'El nodo ya existe';
         }
       }
-      echo "<script type='text/javascript'>alert('$Message');</script>";
+      if($Message!=null){
+        echo "<script type='text/javascript'>alert('$Message');</script>";
+      }
       break;
 
     case 'Buscar Vertice':
@@ -89,6 +91,15 @@ switch ($accion) {
       echo "<script type='text/javascript'>alert('$Message');</script>";
       break;
 
+      case 'Anchura':
+      $nodo = $_POST["nodoI"];
+      $respuesta = $_SESSION['grafo']->recorrerAnchura($nodo);
+        break;
+
+      case 'Profundidad':
+      $nodo = $_POST["nodoI"];
+      $respuesta = $_SESSION['grafo']->recorrerProfundidad($nodo);
+        break;
 }
 
 ?>
@@ -130,6 +141,17 @@ switch ($accion) {
     </div>
     <div class="container" id="Adyacente">
 
+    </div>
+    <div class="container" id="recorrido">
+      <form action="index.php" method="post">
+        <h2>Recorridos del grafo</h2>
+        <input type="text" name="nodoI" placeholder="ID del vertice" required>
+        <input class="info" type="submit" name="accion" value="Anchura">
+        <input class="info" type="submit" name="accion" value="Profundidad">
+      </form>
+      <div class="mostrar">
+        <?php echo "".($respuesta? $respuesta:""); ?>
+      </div>
     </div>
 
   <?php

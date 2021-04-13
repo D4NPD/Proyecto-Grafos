@@ -17,6 +17,16 @@ h1{
   margin: 5px;
   border-radius: 10px;
 }
+.mostrar{
+  border-radius: 5px;
+  border: 1px solid black;
+  width: 300px;
+  height: 50px;
+  background: #ffff;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
 #Grafo1, #Adyacente{
   width: 500px;
   height: 300px;
@@ -31,7 +41,7 @@ h1{
 #Adyacente{
   margin-top: 0px;
 }
-#nodo, #adya{
+#nodo, #adya, #recorrido{
   background-color: rgba(153, 163, 164 , 0.3);
 }
 form{

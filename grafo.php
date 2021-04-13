@@ -58,7 +58,7 @@ class Grafo{
   }
 
   public function eliminarArista($origen, $destino){
-    if(isset($this->aristas[$origen][$destino])){     
+    if(isset($this->aristas[$origen][$destino])){
       unset($this->aristas[$origen][$destino]);
     }else{
       return false;
@@ -111,6 +111,57 @@ class Grafo{
 
   public function grado($vertice){
     return self::gradoSalida($vertice) + self::gradoEntrada($vertice);
+  }
+
+  public function resetNodos(){
+    $nodos = self::getVertices();
+    if($nodos!=null){
+      foreach ($nodos as $key => $value) {
+        $value->setVisitado(false);
+      }
+    }
+  }
+
+  public function recorrerAnchura($nodoI){
+    $cola=[];
+    $respuesta = "";
+    if(isset($this->vertices[$nodoI])){
+      array_push($cola, $nodoI);
+      while (!empty($cola)) {
+        $nodoActual = reset($cola);
+        $id = array_search($nodoActual, $cola);
+        unset($cola[$id]);
+        $vertice = self::getVertice($nodoActual);
+        if(($vertice->getVisitado())==false){
+          $vertice->setVisitado(true);
+          $respuesta = $respuesta."Nodo: ".$vertice->getId()." - ";
+          $llaves = self::getAdyacentes($nodoActual)? array_keys(self::getAdyacentes($nodoActual)):null;
+          $cola = ($llaves!=null)?array_merge($cola,$llaves):$cola;
+        }
+      }
+    }
+    self::resetNodos();
+    return $respuesta;
+  }
+
+  public function recorrerProfundidad($nodoI){
+    $pila=[];
+    $respuesta = "";
+    if (isset($this->vertices[$nodoI])) {
+      array_push($pila, $nodoI);
+      while(!empty($pila)){
+        $nodoActual = array_pop($pila);
+        $vertice = self::getVertice($nodoActual);
+        if($vertice->getVisitado()==false){
+          $vertice->setVisitado(true);
+          $respuesta = $respuesta."Nodo: ".$vertice->getId()." - ";
+          $llaves = self::getAdyacentes($nodoActual)? array_keys(self::getAdyacentes($nodoActual)):null;
+          $pila = ($llaves!=null)?array_merge($pila,$llaves):$pila;
+        }
+      }
+    }
+    self::resetNodos();
+    return $respuesta;
   }
 
 }
