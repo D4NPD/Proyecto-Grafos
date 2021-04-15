@@ -34,6 +34,7 @@ class Grafo{
 
   public function agregarArista($origen, $destino, $peso = null){
     if(isset($this->vertices[$origen]) &&  isset($this->vertices[$destino])){
+      if(empty($peso)) $peso=1;
       $this->aristas[$origen][$destino] = $peso;
     }else{
       return false;
@@ -139,6 +140,8 @@ class Grafo{
           $cola = ($llaves!=null)?array_merge($cola,$llaves):$cola;
         }
       }
+    }else{
+      return "No se encontro nodo inicio";
     }
     self::resetNodos();
     return $respuesta;
@@ -159,9 +162,47 @@ class Grafo{
           $pila = ($llaves!=null)?array_merge($pila,$llaves):$pila;
         }
       }
+    }else{
+      return "No se encontro nodo de inicio";
     }
     self::resetNodos();
     return $respuesta;
+  }
+
+  public function caminoMasCorto($origen,$destino){
+    if(empty($this->vertices[$origen]) || empty($this->vertices[$destino])){
+      return "No existe nodo origen o destino ";
+    }else{
+      $S = array();
+      $Q = array();
+      foreach(array_keys($this->aristas) as $val) $Q[$val] = 99999;
+        $Q[$origen] = 0;
+        while(!empty($Q)){
+          $min = array_search(min($Q), $Q);
+          if($min == $destino) break;
+          if(!empty($this->aristas[$min])) foreach($this->aristas[$min] as $key=>$val) if(!empty($Q[$key]) && $Q[$min] + $val < $Q[$key]) {
+            $Q[$key] = $Q[$min] + $val;
+            $S[$key] = array($min, $Q[$key]);
+          }
+          unset($Q[$min]);
+        }
+      $path = array();
+      $pos = $destino;
+
+      if(!empty($S[$destino])){
+        while($pos != $origen){
+          $path[] = $pos;
+          $pos = $S[$pos][0];
+        }
+      }else{
+        return "No se encontro camino de ".$origen." a ".$destino;
+      }
+      $path[] = $origen;
+
+      $path = array_reverse($path);
+      print_r($path);
+      return $path;
+    }
   }
 
 }
