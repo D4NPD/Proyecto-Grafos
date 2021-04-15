@@ -26,7 +26,7 @@ switch ($accion) {
         $Message = 'Ingrese el vertice que desea buscar';
       }else{
         $valor = $_SESSION['grafo']->getVertice($_POST['Vertice']);
-        if($valor!=null){
+        if($valor!=null){ 
           $Message = ($valor->getVisitado())? "Visitado":"No visitado";
           $Message = "Id: ".$valor->getId()." Vertice ".$Message;
         }else{
