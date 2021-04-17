@@ -6,19 +6,22 @@
   }
 
 $accion = (isset($_POST["accion"]))?$_POST["accion"]:"";
-
+$ruta = null;
+$respuesta="";
 switch ($accion) {
     case 'Guardar Vertice':
       if (empty($_POST["Vertice"])) {
         $Message = 'El campo de texto no puede estar vacio';
       }else {
         if($_SESSION["grafo"]->agregarVertice(new vertice($_POST["Vertice"]))){
-          $Message = 'Guardado Correctamente';
+          $Message = null;
         }else{
           $Message = 'El nodo ya existe';
         }
       }
-      echo "<script type='text/javascript'>alert('$Message');</script>";
+      if($Message!=null){
+        echo "<script type='text/javascript'>alert('$Message');</script>";
+      }
       break;
 
     case 'Buscar Vertice':
@@ -89,6 +92,22 @@ switch ($accion) {
       echo "<script type='text/javascript'>alert('$Message');</script>";
       break;
 
+      case 'Anchura':
+      $nodo = $_POST["nodoI"];
+      $respuesta = $_SESSION['grafo']->recorrerAnchura($nodo);
+        break;
+
+      case 'Profundidad':
+      $nodo = $_POST["nodoI"];
+      $respuesta = $_SESSION['grafo']->recorrerProfundidad($nodo);
+        break;
+
+      case 'Camino más corto':
+      $nodoOrigen = $_POST['verticeOrigen'];
+      $nodoDestino = $_POST['verticeDestino'];
+      $ruta = $_SESSION['grafo']->caminoMasCorto($nodoOrigen,$nodoDestino);
+      if(!is_array($ruta) && $ruta!=null) echo "<script type='text/javascript'>alert('$ruta');</script>";
+        break;
 }
 
 ?>
@@ -103,7 +122,7 @@ switch ($accion) {
   </head>
   <body>
     <h1>Proyecto de Grafos</h1>
-    <div class="container" id="nodo">
+    <div class="container -color">
       <form action="index.php" method="post" id="vertice">
         <h2> Vertices</h2>
         <input type="text" name="Vertice" placeholder="ID del verice" required>
@@ -114,7 +133,7 @@ switch ($accion) {
         <input class="info" type="submit" name="accion" value="Mostrar Grado">
       </form>
     </div>
-    <div class="container" id="adya">
+    <div class="container -color">
       <form action="index.php" method="post" id="aristas">
         <h2> Aristas </h2>
         <input type="text" name="Origen" placeholder="Vertice de origen" required>
@@ -130,6 +149,25 @@ switch ($accion) {
     </div>
     <div class="container" id="Adyacente">
 
+    </div>
+    <div class="container -color -posicion">
+      <form action="index.php" method="post">
+        <h2>Recorridos del grafo</h2>
+        <input type="text" name="nodoI" placeholder="ID del vertice" required>
+        <input class="info" type="submit" name="accion" value="Anchura">
+        <input class="info" type="submit" name="accion" value="Profundidad">
+      </form>
+      <div class="mostrar">
+        <?php echo "".($respuesta? $respuesta:""); ?>
+      </div>
+    </div>
+    <div class="container -color -posicion -margen">
+      <form action="index.php" method="post">
+        <h2>Buscar el camino más corto</h2>
+        <input type="text" name="verticeOrigen"placeholder="Origen" required>
+        <input type="text" name="verticeDestino" placeholder="Destino" required>
+        <input class="verde" type="submit" name="accion" value="Camino más corto">
+      </form>
     </div>
 
   <?php
@@ -177,7 +215,15 @@ switch ($accion) {
       <?php
         $matriz = $_SESSION["grafo"]->getAristas();
         foreach ($matriz as $nodos => $vector) {
-            echo "{id:'$nodos', label: '$nodos'},";
+            echo "{id:'$nodos', label: '$nodos'";
+            if(is_array($ruta) && !empty($ruta)){
+              for ($i=0; $i<count($ruta) ; $i++) {
+                if($ruta[$i]==$nodos){
+                  echo ",font: {color: 'white'},color:{ background: 'red' }";
+                }
+              }
+            }
+            echo "},";
         };
       ?>
     ]);
@@ -185,13 +231,26 @@ switch ($accion) {
     var aristas = new vis.DataSet([
       <?php
         $matriz = $_SESSION["grafo"]->getAristas();
+
         foreach ($matriz as $nodos => $vector) {
           if ($vector!=null) {
-            foreach ($vector as $destino => $peso) {
-              echo "{from: '$nodos', to: '$destino', label: '$peso' },";
-            }
-          }
-        }
+              foreach ($vector as $destino => $peso) {
+                echo "{from: '$nodos', to: '$destino', label: '$peso' ";
+                    if(is_array($ruta) && !empty($ruta)){
+                      if(in_array($nodos,$ruta) && in_array($destino,$ruta)){
+                          if(array_search($nodos,$ruta) < array_search($destino,$ruta)){
+                            if(end($ruta)==$nodos){
+                            }else{
+                              echo ",color: {color: 'red'}";
+                            }
+                          }
+                        }              
+                      }
+                    echo "},";
+                  }
+                }
+              }
+          
       ?>
     ]);
 
