@@ -34,6 +34,7 @@ class Grafo{
 
   public function agregarArista($origen, $destino, $peso = null){
     if(isset($this->vertices[$origen]) &&  isset($this->vertices[$destino])){
+      if(empty($peso)) $peso=1;
       $this->aristas[$origen][$destino] = $peso;
     }else{
       return false;
@@ -58,7 +59,7 @@ class Grafo{
   }
 
   public function eliminarArista($origen, $destino){
-    if(isset($this->aristas[$origen][$destino])){     
+    if(isset($this->aristas[$origen][$destino])){
       unset($this->aristas[$origen][$destino]);
     }else{
       return false;
@@ -111,6 +112,96 @@ class Grafo{
 
   public function grado($vertice){
     return self::gradoSalida($vertice) + self::gradoEntrada($vertice);
+  }
+
+  public function resetNodos(){
+    $nodos = self::getVertices();
+    if($nodos!=null){
+      foreach ($nodos as $key => $value) {
+        $value->setVisitado(false);
+      }
+    }
+  }
+
+  public function recorrerAnchura($nodoI){
+    $cola=[];
+    $respuesta = "";
+    if(isset($this->vertices[$nodoI])){
+      array_push($cola, $nodoI);
+      while (!empty($cola)) {
+        $nodoActual = reset($cola);
+        $id = array_search($nodoActual, $cola);
+        unset($cola[$id]);
+        $vertice = self::getVertice($nodoActual);
+        if(($vertice->getVisitado())==false){
+          $vertice->setVisitado(true);
+          $respuesta = $respuesta."Nodo: ".$vertice->getId()." - ";
+          $llaves = self::getAdyacentes($nodoActual)? array_keys(self::getAdyacentes($nodoActual)):null;
+          $cola = ($llaves!=null)?array_merge($cola,$llaves):$cola;
+        }
+      }
+    }else{
+      return "No se encontro nodo inicio";
+    }
+    self::resetNodos();
+    return $respuesta;
+  }
+
+  public function recorrerProfundidad($nodoI){
+    $pila=[];
+    $respuesta = "";
+    if (isset($this->vertices[$nodoI])) {
+      array_push($pila, $nodoI);
+      while(!empty($pila)){
+        $nodoActual = array_pop($pila);
+        $vertice = self::getVertice($nodoActual);
+        if($vertice->getVisitado()==false){
+          $vertice->setVisitado(true);
+          $respuesta = $respuesta."Nodo: ".$vertice->getId()." - ";
+          $llaves = self::getAdyacentes($nodoActual)? array_keys(self::getAdyacentes($nodoActual)):null;
+          $pila = ($llaves!=null)?array_merge($pila,$llaves):$pila;
+        }
+      }
+    }else{
+      return "No se encontro nodo de inicio";
+    }
+    self::resetNodos();
+    return $respuesta;
+  }
+
+  public function caminoMasCorto($origen,$destino){
+    if(empty($this->vertices[$origen]) || empty($this->vertices[$destino])){
+      return "No existe nodo origen o destino ";
+    }else{
+      $S = array();
+      $Q = array();
+      foreach(array_keys($this->aristas) as $val) $Q[$val] = 99999;
+        $Q[$origen] = 0;
+        while(!empty($Q)){
+          $min = array_search(min($Q), $Q);
+          if($min == $destino) break;
+          if(!empty($this->aristas[$min])) foreach($this->aristas[$min] as $key=>$val) if(!empty($Q[$key]) && $Q[$min] + $val < $Q[$key]) {
+            $Q[$key] = $Q[$min] + $val;
+            $S[$key] = array($min, $Q[$key]);
+          }
+          unset($Q[$min]);
+        }
+      $path = array();
+      $pos = $destino;
+
+      if(!empty($S[$destino])){
+        while($pos != $origen){
+          $path[] = $pos;
+          $pos = $S[$pos][0];
+        }
+      }else{
+        return "No se encontro camino de ".$origen." a ".$destino;
+      }
+      $path[] = $origen;
+
+      $path = array_reverse($path);
+      return $path;
+    }
   }
 
 }
